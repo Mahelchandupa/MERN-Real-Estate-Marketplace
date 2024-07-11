@@ -19,6 +19,9 @@ function Profile() {
   const [formData, setFormData] = useState({})
   const [updateSuccess, setUpdateSuccess] = useState(false)
 
+  const [showListingsError, setShowListingsError] = useState(false)
+  const [userListings, setUserListings] = useState([])
+
   useEffect(() => {
     if (file) {
       handleFileUpload(file)
@@ -35,19 +38,20 @@ function Profile() {
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
       setFilePercentage(Math.round(progress))
     },
-    (error) => {
-      console.error("File upload error: ", error);
-      setFileUploadError(true)
-    },
-    () => {
-      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        setFormData({ ...formData, avatar: downloadURL})
-      })
-    }
-  )}
+      (error) => {
+        console.error("File upload error: ", error);
+        setFileUploadError(true)
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setFormData({ ...formData, avatar: downloadURL })
+        })
+      }
+    )
+  }
 
   const handleFormData = (e) => {
-     setFormData({...formData, [e.target.id]: e.target.value})
+    setFormData({ ...formData, [e.target.id]: e.target.value })
   }
 
   const handleSubmit = async (e) => {
@@ -91,7 +95,7 @@ function Profile() {
   }
 
   const handleSignOut = async () => {
-     try {
+    try {
       dispatch(signOutStart())
       const res = await fetch('/api/auth/signout')
       const data = await res.json()
@@ -100,9 +104,23 @@ function Profile() {
         return;
       }
       dispatch(signOutSuccess(data))
-     } catch (error) {
-        dispatch(signOutFailure(error.message))
-     }
+    } catch (error) {
+      dispatch(signOutFailure(error.message))
+    }
+  }
+
+  const handleShowListings = async () => {
+    try {
+      const res = await fetch(`api/user/listings/${currentUser._id}`)
+      const data = await res.json()
+      if (data.success == false) {
+        setShowListingsError(true)
+        return;
+      }
+      setUserListings(data)
+    } catch (error) {
+      setShowListingsError(true)
+    }
   }
 
   return (
@@ -113,12 +131,12 @@ function Profile() {
         <img onClick={() => fileRef.current.click()} src={formData.avatar || currentUser?.avatar} alt="profile" className=' cursor-pointer rounded-full h-24 w-24 object-cover self-center mt-2' />
         <p className=' text-sm self-center'>
           {
-            fileUploadeError ? 
-            <span className=' text-red-700'>Error Image upload (image must be less than 2 mb)</span> :
-            filePercentage > 0 && filePercentage < 100 ?
-            <span className=' text-slate-700'>{`Uploading ${filePercentage}%`}</span> :
-            filePercentage === 100 ? 
-            <span className=' text-green-700'>Image successfully uploaded!</span> : ""
+            fileUploadeError ?
+              <span className=' text-red-700'>Error Image upload (image must be less than 2 mb)</span> :
+              filePercentage > 0 && filePercentage < 100 ?
+                <span className=' text-slate-700'>{`Uploading ${filePercentage}%`}</span> :
+                filePercentage === 100 ?
+                  <span className=' text-green-700'>Image successfully uploaded!</span> : ""
           }
         </p>
         <input onChange={handleFormData} defaultValue={currentUser.username} type="text" placeholder='username' id='username' className=' border p-3 rounded-lg' />
@@ -134,6 +152,31 @@ function Profile() {
 
       <p className=' text-red-700 mt-5'>{error ? error : ''}</p>
       <p className=' text-green-700 mt-5'>{updateSuccess ? 'User is update successfully!' : ''}</p>
+
+      <button onClick={handleShowListings} className=' text-green-700 w-full'>Show Listings</button>
+      <p className=' text-red-700 mt-5 text-sm'>{showListingsError ? 'Error fetching listings' : ''}</p>
+
+      {
+        userListings && userListings.length > 0 &&
+        <div className=' flex flex-col gap-4'>
+          <h1 className=' text-center mt-7 text-2xl font-semibold'>Your Listings</h1>
+          {
+            userListings.map((listing) => (
+              <div className=' border rounded-lg p-3 flex justify-between items-center gap-4' key={listing._id} >
+                <Link to={`/listing/${listing._id}`}>
+                  <img src={listing.imageUrls[0]} alt='listing cover' className=' h-16 w-16 object-contain' />
+                </Link>
+                <Link className=' flex-1 text-slate-700 font-semibold hover:underline truncate' to={`/listing/${listing._id}`}>
+                  <p>{listing.name}</p>
+                </Link>
+
+                <div className=' flex flex-col items-center'>
+                  <button className=' text-red-700 uppercase'>Delete</button>
+                  <button className=' text-green-700 uppercase'>Edit</button>
+                </div>
+              </div>
+            ))}
+        </div>}
     </div>
   )
 }
