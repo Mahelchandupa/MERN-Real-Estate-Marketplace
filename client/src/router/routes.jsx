@@ -6,6 +6,7 @@ import About from "../pages/About";
 import Profile from "../pages/Profile";
 import Root from "./root";
 import PrivateRoute from "../components/PrivateRoute";
+import CreateListing from "../pages/CreateListing";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,14 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Profile />
+          </PrivateRoute>
+        )
+      },
+      {
+        path: '/create-listing',
+        element: (
+          <PrivateRoute>
+            <CreateListing />
           </PrivateRoute>
         )
       }
