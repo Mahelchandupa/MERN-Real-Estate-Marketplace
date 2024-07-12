@@ -52,8 +52,8 @@ function Home() {
   console.log(offerListings)
 
   return (
-    <div>
-      <div className=' flex flex-col gap-6 p-28 max-w-6xl mx-auto'>
+    <div className=''>
+      <div className=' flex flex-col gap-6 p-20 sm:p-28 max-w-7xl mx-auto'>
         <h1 className=' text-slate-700 font-bold text-3xl lg:text-6xl'>Find your next <span className=' text-slate-500'>perfect</span>
           <br />
           place to live.
@@ -85,7 +85,7 @@ function Home() {
           ))}
       </Swiper>
 
-      <div className=' max-w-6xl mx-auto p-3 flex flex-col gap-8 my-10'>
+      <div className=' max-w-7xl mx-auto p-3 flex flex-col gap-8 my-10'>
         {
           offerListings && offerListings.length > 0 && (
             <div>
