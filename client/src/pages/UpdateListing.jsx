@@ -3,6 +3,9 @@ import React, { useEffect, useState } from 'react'
 import { app } from '../firebase'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { set } from 'mongoose'
 
 function UpdateListing() {
 
@@ -28,18 +31,30 @@ function UpdateListing() {
     })
 
     useEffect(() => {
-      const fetchListing = async () => {
-         const listingId = params.listingId
-         const res = await fetch(`/api/listing/get/${listingId}`)
-          const data = await res.json()
-          if (data.success === false) {
-            console.log(data.message)
-            return
+        const fetchListing = async () => {
+            try {
+            const listingId = params.listingId;
+            const res = await fetch(`/api/listing/get/${listingId}`);
+            const data = await res.json();
+            if (data.success === false) {
+              console.log(data.message);
+              return;
+            }
+            const { description, ...rest } = data;
+            console.log('description:', description);
+            console.log('rest:', rest);
+            setFormData((prevData) => ({
+                ...prevData,
+                ...rest,
+                description: description
+            }));
+          } catch (error) {
+            console.error('Error fetching listing:', error);
           }
-          setFormData(data)
-      }
-      fetchListing()
-    }, [])
+        };
+    
+        fetchListing();
+      }, [params.listingId]);
 
     const [imageUploadError, setImageUploadError] = useState(false)
     const [uploading, setUploading] = useState(false)
@@ -122,6 +137,13 @@ function UpdateListing() {
         }
     }
 
+    const handleDescriptionChange = (value) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            description: value
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
@@ -153,13 +175,17 @@ function UpdateListing() {
         }
     }
 
+    console.log('formdata:',formData);
+
     return (
         <main className=' p-3 max-w-4xl mx-auto'>
             <h1 className=' text-3xl font-semibold text-center my-7'>Update a Listing</h1>
             <form onSubmit={handleSubmit} className=' flex flex-col sm:flex-row gap-4'>
                 <div className=' flex flex-col gap-4 flex-1'>
                     <input onChange={handleChange} value={formData.name} type="text" placeholder='Name' className=' border p-3 rounded-lg' id="name" maxLength='62' minLength='10' required />
-                    <textarea onChange={handleChange} value={formData.description} type="text" placeholder='Description' className=' border p-3 rounded-lg' id="description" required />
+                    <div className=' h-[180px] bg-slate-50'>
+                      <ReactQuill value={formData.description} onChange={handleDescriptionChange} placeholder='Description' className=' h-[140px]' id="description" required />
+                    </div>                    
                     <input onChange={handleChange} value={formData.address} type="text" placeholder='Address' className=' border p-3 rounded-lg' id="address" required />
                     <div className=' flex gap-6 flex-wrap'>
                         <div className=' flex gap-2'>

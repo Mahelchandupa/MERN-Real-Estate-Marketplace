@@ -13,7 +13,7 @@ function ListingCard({ listing }) {
                         <MdLocationOn className=' h-4 w-4 text-green-700'/>
                         <p className=' text-sm text-gray-600 truncate w-full'>{listing.address}</p>
                     </div>
-                    <p className=' text-sm text-gray-600 line-clamp-2'>{listing.description}</p>
+                    <div className=' text-sm text-gray-600 line-clamp-2' dangerouslySetInnerHTML={{ __html: listing.description }}/>
                     <p className=' text-slate-500 mt-2 font-semibold'>
                         $
                         {

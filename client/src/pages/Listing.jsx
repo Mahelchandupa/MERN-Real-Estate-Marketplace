@@ -111,9 +111,10 @@ function Listing() {
                                     )
                                 }
                             </div>
-                            <p className=' text-slate-800'>
-                                <span className=' font-semibold text-black'>Description - {' '} </span>{listing.description}
-                            </p>
+                            <div className=' text-slate-800 flex flex-col gap-1'>
+                                <span className=' font-semibold text-black'>Description</span>
+                                <div dangerouslySetInnerHTML={{ __html: listing.description }}/>
+                            </div>
                             <ul className=' text-green-900 font-semibold text-sm flex items-center gap-4 sm:gap-6 flex-wrap'>
                                 <li className=' flex items-center gap-1 whitespace-nowrap'>
                                     <FaBed className=' text-lg'/>

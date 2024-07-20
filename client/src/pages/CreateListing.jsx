@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import { app } from '../firebase'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 function CreateListing() {
 
@@ -108,6 +110,13 @@ function CreateListing() {
         }
     }
 
+    const handleDescriptionChange = (value) => {
+        setFormData({
+         ...formData,
+         description: value
+        })
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
@@ -145,7 +154,9 @@ function CreateListing() {
             <form onSubmit={handleSubmit} className=' flex flex-col sm:flex-row gap-4'>
                 <div className=' flex flex-col gap-4 flex-1'>
                     <input onChange={handleChange} value={formData.name} type="text" placeholder='Name' className=' border p-3 rounded-lg' id="name" maxLength='62' minLength='10' required />
-                    <textarea onChange={handleChange} value={formData.description} type="text" placeholder='Description' className=' border p-3 rounded-lg' id="description" required />
+                    <div className=' h-[180px] bg-slate-50'>
+                      <ReactQuill value={formData.description} onChange={handleDescriptionChange} placeholder='Description' className=' h-[140px]' id="description" required />
+                    </div>
                     <input onChange={handleChange} value={formData.address} type="text" placeholder='Address' className=' border p-3 rounded-lg' id="address" required />
                     <div className=' flex gap-6 flex-wrap'>
                         <div className=' flex gap-2'>
